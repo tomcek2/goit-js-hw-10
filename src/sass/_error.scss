@@ -1,0 +1,11 @@
+.error {
+  color: red;
+  position: relative;
+  display: none;
+  z-index: 1;
+  top: 20px;
+  left: 10px;
+}
+.error.visible {
+  display: block;
+}
