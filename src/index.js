@@ -13,7 +13,7 @@ axios.defaults.headers.common[APIKey] = 'TOM_CEK';
 const selector = e => {
   e.preventDefault();
   const catId = e.currentTarget.value;
-  fetchCatByBreed(123);
+  fetchCatByBreed(catId);
 };
 
 breedSelect.addEventListener('submit', fetchBreeds);
