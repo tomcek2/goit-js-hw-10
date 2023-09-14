@@ -32,25 +32,22 @@ const createElement = ({
   return el;
 };
 
-//  Fetching breeds form api  //
+// Fetching cat info form API  //
 const breedList = [];
+
 function fetchBreeds() {
-  axios
+  return axios
     .get('/v1/breeds')
     .then(response => response.data)
     .then(data => {
-      breedList.push(...data);
-      console.log(typeof breedList);
-      console.log(breedList);
-      console.log(breedList[0]);
+      return data;
     })
-    .catch(e => {
-      // handle error
-      console.log(e);
+    .catch(error => {
+      console.error(error);
+      throw error;
     });
 }
 
-//  Creating options to select list from api informations  //
 const optionList = breed => {
   const breedOptions = createElement({
     type: 'option',
@@ -62,24 +59,17 @@ const optionList = breed => {
   });
   return breedOptions;
 };
+
+//  Creating select menu  //
 const createSelect = e => {
   e.preventDefault();
   showLoader(breedSelect);
-  fetchBreeds();
-  const promise = new Promise(resolve => {
-    if (fetchBreeds) {
-      resolve(breedList);
-    }
-  });
-  promise
-    .then(breed => {
-      console.log(typeof breed);
-      console.log(breed);
-      console.log(breed[0]);
-      console.log(typeof breedList);
-      console.log(breedList);
-      console.log(breedList[0]);
-      breedSelect.append(...breed.map(optionList));
+  fetchBreeds()
+    .then(breedData => {
+      breedSelect.append(...breedData.map(optionList));
+    })
+    .catch(error => {
+      console.log(error);
     })
     .finally(() => {
       hideLoader(breedSelect);
@@ -140,7 +130,7 @@ const catInfoSection = info => {
   return infoSection;
 };
 
-// Fetching cat informations from api  //
+// Fetching cat photo from api  //
 const fetchCatByBreed = breedId => {
   showLoader(catInfo);
   while (catInfo.firstChild) {
@@ -153,26 +143,21 @@ const fetchCatByBreed = breedId => {
       catInfo.prepend(...data.map(catPhoto));
     })
     .catch(e => {
-      // handle error
       console.log(e);
     });
-  axios
-    .get('/v1/breeds')
-    .then(response => response.data)
+  //  Creating cat information section  //
+  fetchBreeds()
     .then(data => {
       return data.find(breed => breed.id === breedId);
     })
     .then(info => {
       catInfo.append(catInfoSection(info));
     })
-    .catch(e => {
-      //  handle error  //
-
-      showError();
-      console.log(e);
+    .catch(error => {
+      console.log(error);
     })
     .finally(() => {
-      hideLoader(catInfo);
+      hideLoader(breedSelect);
     });
 };
 
