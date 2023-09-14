@@ -1,16 +1,14 @@
 import axios from 'axios';
-export { fetchBreeds, createElement, fetchCatByBreed };
+export { fetchBreeds, createElement, fetchCatByBreed, createSelect };
 
 const breedSelect = document.querySelector('.breed-select');
 const catInfo = document.querySelector('.cat-info');
 const loader = document.querySelector('.loader');
 const error = document.querySelector('.error');
 
-const APIKey =
-  'live_OCkEOjG94SMl2WhtszkoVkvhynaMaYATELP1Fw86WLaMyxMSbcwY8WS6NQeJdUfl';
-
 axios.defaults.baseURL = 'https://api.thecatapi.com/';
-axios.defaults.headers.common[APIKey] = 'TOM_CEK';
+axios.defaults.headers.common['x-api-key'] =
+  'live_OCkEOjG94SMl2WhtszkoVkvhynaMaYATELP1Fw86WLaMyxMSbcwY8WS6NQeJdUfl';
 
 // Function to create element  //
 const createElement = ({
@@ -34,6 +32,24 @@ const createElement = ({
   return el;
 };
 
+//  Fetching breeds form api  //
+const breedList = [];
+function fetchBreeds() {
+  axios
+    .get('/v1/breeds')
+    .then(response => response.data)
+    .then(data => {
+      breedList.push(...data);
+      console.log(typeof breedList);
+      console.log(breedList);
+      console.log(breedList[0]);
+    })
+    .catch(e => {
+      // handle error
+      console.log(e);
+    });
+}
+
 //  Creating options to select list from api informations  //
 const optionList = breed => {
   const breedOptions = createElement({
@@ -46,20 +62,24 @@ const optionList = breed => {
   });
   return breedOptions;
 };
-
-//  Fetching breeds form api  //
-const fetchBreeds = e => {
+const createSelect = e => {
   e.preventDefault();
   showLoader(breedSelect);
-  axios
-    .get('/v1/breeds')
-    .then(response => response.data)
-    .then(data => {
-      breedSelect.append(...data.map(optionList));
-    })
-    .catch(e => {
-      // handle error
-      console.log(e);
+  fetchBreeds();
+  const promise = new Promise(resolve => {
+    if (fetchBreeds) {
+      resolve(breedList);
+    }
+  });
+  promise
+    .then(breed => {
+      console.log(typeof breed);
+      console.log(breed);
+      console.log(breed[0]);
+      console.log(typeof breedList);
+      console.log(breedList);
+      console.log(breedList[0]);
+      breedSelect.append(...breed.map(optionList));
     })
     .finally(() => {
       hideLoader(breedSelect);
